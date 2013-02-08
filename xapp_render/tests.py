@@ -3,6 +3,7 @@ Tests for xapp_render
 """
 
 # pylint: disable=R0904
+# pylint: disable=C0103
 
 import os
 import shutil

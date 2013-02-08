@@ -109,6 +109,9 @@ TEMPLATE_DIRS = (
 
 
 TEMPLATE_LOADERS = (
+   'coffin.template.loaders.Loader',
+)
+JINJA2_TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
 #     'django.template.loaders.eggs.Loader',
@@ -122,12 +125,19 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     
     'xapp_render',
+    'test_main_app',
+    'test_main_coffin_app',
+    'test_sub_app',
 
     # Uncomment the next line to enable the admin:
     'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
     'django_jenkins',
+)
+
+JINJA2_DISABLED_TEMPLATES = (
+    'test_main_app',
 )
 
 # A sample logging configuration. The only tangible logging

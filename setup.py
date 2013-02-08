@@ -13,4 +13,5 @@ setup(
     maintainer_email     = 'mike.bryant@ocado.com',
     packages             = ['xapp_render'],
     install_requires     = ['django >= 1.4'],
+    tests_require        = ['coffin'],
 )

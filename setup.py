@@ -12,6 +12,6 @@ setup(
     maintainer           = 'Mike Bryant',
     maintainer_email     = 'mike.bryant@ocado.com',
     packages             = ['xapp_render'],
-    install_requires     = ['django >= 1.4'],
-    tests_require        = ['coffin'],
+    install_requires     = ['django >= 1.4', 'coffin', 'jinja2'],
+    tests_require        = ['coffin', 'jinja2'],
 )

@@ -86,7 +86,7 @@ class DjangoTestCase(AppCreatorTestCase):
 
 
 @override_settings(
-    INSTALLED_APPS=['xapp_render', 'xapp_test_app_4', 'xapp_test_app_5', 'xapp_test_app_6'],
+    INSTALLED_APPS=['xapp_render', 'xapp_test_app_4', 'xapp_test_app_5', 'xapp_test_app_6', 'xapp_test_app_7'],
     TEMPLATE_LOADERS = (
        'coffin.template.loaders.Loader',
     ),
@@ -98,7 +98,7 @@ class DjangoTestCase(AppCreatorTestCase):
 class Jinja2TestCase(AppCreatorTestCase):
     '''Test the simple case, with only templates'''
 
-    apps = ['xapp_test_app_4', 'xapp_test_app_5', 'xapp_test_app_6']
+    apps = ['xapp_test_app_4', 'xapp_test_app_5', 'xapp_test_app_6', 'xapp_test_app_7']
     templates = {
         'xapp_test_app_4': (
             ('base2.html', '{% xapp_render "test2.html" %}'),

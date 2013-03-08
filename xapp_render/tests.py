@@ -5,18 +5,27 @@ Tests for xapp_render
 # pylint: disable=R0904
 # pylint: disable=C0103
 
+import mock
 import os
 import shutil
 import sys
 import tempfile
 
 from django.core.management import call_command
+from django.dispatch import receiver
 import django.template.loader
 from django.template.loader import render_to_string
 import django.template.loaders.app_directories
 from django.test import TestCase
+from django.test.signals import setting_changed
 from django.test.utils import override_settings
 
+from .template_utils import reset_cache
+
+@receiver(setting_changed)
+def cache_reset_handler(*_args, **_kwargs):
+    '''Reset the cache whenever we change installed apps.'''
+    reset_cache()
 
 class AppCreatorTestCase(TestCase):
     '''Test case that creates some extra apps.'''
@@ -83,6 +92,47 @@ class DjangoTestCase(AppCreatorTestCase):
     def test_content(self):
         '''Test if rendering the templates includes the content'''
         self.assertIn('FlibbleDribble', render_to_string('xapp_test_app_1/base.html', {}))
+
+def broken_open(*_args, **_kwargs):
+    '''Break open completely.'''
+    raise Exception
+
+@override_settings(
+    INSTALLED_APPS=['xapp_render', 'xapp_test_app_8', 'xapp_test_app_9', 'xapp_test_app_10'],
+    TEMPLATE_LOADERS = (
+        ('django.template.loaders.cached.Loader', (
+            'django.template.loaders.filesystem.Loader',
+            'django.template.loaders.app_directories.Loader',
+        )),
+    ),
+)
+class CachedTestCase(AppCreatorTestCase):
+    '''Test caching of templates.'''
+
+    apps = ['xapp_test_app_8', 'xapp_test_app_9', 'xapp_test_app_10']
+    templates = {
+        'xapp_test_app_8': (
+            ('base.html', '{% load xapp_render %}{% xapp_render "test1.html" %}'),
+        ),
+        'xapp_test_app_9': (
+            ('test1.html', 'Blah'),
+        ),
+        'xapp_test_app_10': (
+        ),
+    }
+
+    def test_caching(self):
+        '''Test if the missing template caching code is working.'''
+        # If we're not doing negative caching we'll hit the open call, and things will break
+        reset_cache()
+        with mock.patch('__builtin__.open', broken_open):
+            with self.assertRaises(Exception):
+                render_to_string('xapp_test_app_8/base.html', {})
+
+        self.assertIn('Blah', render_to_string('xapp_test_app_8/base.html', {}))
+        with mock.patch('__builtin__.open', broken_open):
+            self.assertIn('Blah', render_to_string('xapp_test_app_8/base.html', {}))
+
 
 
 @override_settings(

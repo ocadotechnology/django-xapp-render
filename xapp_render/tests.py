@@ -13,6 +13,7 @@ import tempfile
 
 from django.core.management import call_command
 from django.dispatch import receiver
+from django.template import TemplateDoesNotExist
 import django.template.loader
 from django.template.loader import render_to_string
 import django.template.loaders.app_directories
@@ -80,9 +81,11 @@ class DjangoTestCase(AppCreatorTestCase):
     templates = {
         'xapp_test_app_1': (
             ('base.html', '{% load xapp_render %}{% xapp_render "test1.html" %}'),
+            ('base2.html', '{% load xapp_render %}{% xapp_render "test2.html" %}'),
         ),
         'xapp_test_app_2': (
             ('test1.html', '{% ifequal True True %}Flibble{% endifequal %}'), #Need to be sure we're in django
+            ('test2.html', '{% include "notexist.html" %}'),
         ),
         'xapp_test_app_3': (
             ('test1.html', 'Dribble'),
@@ -92,6 +95,14 @@ class DjangoTestCase(AppCreatorTestCase):
     def test_content(self):
         '''Test if rendering the templates includes the content'''
         self.assertIn('FlibbleDribble', render_to_string('xapp_test_app_1/base.html', {}))
+
+    def test_broken_templates(self):
+        '''We want to raise TemplateDoesNotExist if the reason behind
+            one of the xapp templates not existing is because it includes
+            something broken.
+        '''
+        with self.assertRaises(TemplateDoesNotExist):
+            render_to_string('xapp_test_app_1/base2.html', {})
 
 def broken_open(*_args, **_kwargs):
     '''Break open completely.'''

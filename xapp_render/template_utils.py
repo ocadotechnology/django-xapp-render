@@ -26,11 +26,15 @@ def render_content(identifier, context):
         try:
             content += render_to_string(template_name, context)
             working_modules.append(module)
-        except TemplateDoesNotExist:
-            LOGGER.debug(
-                "Template %s not found during xapp_render",
-                template_name
-            )
+        except TemplateDoesNotExist as err:
+            missing_name = err.args[0]
+            if missing_name == template_name:
+                LOGGER.debug(
+                    "Template %s not found during xapp_render",
+                    template_name,
+                )
+            else:
+                raise
 
     if identifier not in TEMPLATE_CACHE:
         TEMPLATE_CACHE[identifier] = working_modules
@@ -38,4 +42,5 @@ def render_content(identifier, context):
     return content
 
 def reset_cache():
+    '''Reset the template cache.'''
     TEMPLATE_CACHE.clear()

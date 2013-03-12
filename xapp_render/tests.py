@@ -22,11 +22,17 @@ from django.test.signals import setting_changed
 from django.test.utils import override_settings
 
 from .template_utils import reset_cache
+from .utils import xapp_receiver
 
 @receiver(setting_changed)
 def cache_reset_handler(*_args, **_kwargs):
     '''Reset the cache whenever we change installed apps.'''
     reset_cache()
+
+@xapp_receiver('test5.html')
+def test5_rendered_data(context):
+    '''Respond with some data rendered from the context.'''
+    return render_to_string('xapp_test_app_1/test5_data.html', context)
 
 class AppCreatorTestCase(TestCase):
     '''Test case that creates some extra apps.'''
@@ -81,11 +87,13 @@ class DjangoTestCase(AppCreatorTestCase):
     templates = {
         'xapp_test_app_1': (
             ('base.html', '{% load xapp_render %}{% xapp_render "test1.html" %}'),
-            ('base2.html', '{% load xapp_render %}{% xapp_render "test2.html" %}'),
+            ('base2.html', '{% load xapp_render %}{% xapp_render "test4.html" %}'),
+            ('base3.html', '{% load xapp_render %}{% xapp_render "test5.html" %}'),
+            ('test5_data.html', 'Data5: {{ context_data5 }}'),
         ),
         'xapp_test_app_2': (
             ('test1.html', '{% ifequal True True %}Flibble{% endifequal %}'), #Need to be sure we're in django
-            ('test2.html', '{% include "notexist.html" %}'),
+            ('test4.html', '{% include "notexist.html" %}'),
         ),
         'xapp_test_app_3': (
             ('test1.html', 'Dribble'),
@@ -95,6 +103,12 @@ class DjangoTestCase(AppCreatorTestCase):
     def test_content(self):
         '''Test if rendering the templates includes the content'''
         self.assertIn('FlibbleDribble', render_to_string('xapp_test_app_1/base.html', {}))
+
+    def test_signals(self):
+        '''Test signals functionality.'''
+        result = render_to_string('xapp_test_app_1/base3.html', {'context_data5': 'XXYYZZ5'})
+        self.assertIn('Data5: XXYYZZ5', result)
+        self.assertNotIn('Data5: XXYYZZ5', render_to_string('xapp_test_app_1/base.html', {'context_data5': 'XXYYZZ5'}))
 
     def test_broken_templates(self):
         '''We want to raise TemplateDoesNotExist if the reason behind
@@ -123,10 +137,10 @@ class CachedTestCase(AppCreatorTestCase):
     apps = ['xapp_test_app_8', 'xapp_test_app_9', 'xapp_test_app_10']
     templates = {
         'xapp_test_app_8': (
-            ('base.html', '{% load xapp_render %}{% xapp_render "test1.html" %}'),
+            ('base.html', '{% load xapp_render %}{% xapp_render "test3.html" %}'),
         ),
         'xapp_test_app_9': (
-            ('test1.html', 'Blah'),
+            ('test3.html', 'Blah'),
         ),
         'xapp_test_app_10': (
         ),

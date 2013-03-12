@@ -4,6 +4,8 @@ from django.conf import settings
 from django.template import TemplateDoesNotExist
 from django.template.loader import render_to_string
 
+from .signals import RENDER_REQUESTED
+
 import logging
 LOGGER = logging.getLogger(__name__)
 
@@ -38,6 +40,10 @@ def render_content(identifier, context):
 
     if identifier not in TEMPLATE_CACHE:
         TEMPLATE_CACHE[identifier] = working_modules
+
+    LOGGER.debug('Calling signal handler for identifier %s', identifier)
+    for (_receiver, response) in RENDER_REQUESTED.send(sender=identifier, context=context):
+        content += response
 
     return content
 

@@ -42,7 +42,10 @@ def render_content(identifier, context):
         TEMPLATE_CACHE[identifier] = working_modules
 
     LOGGER.debug('Calling signal handler for identifier %s', identifier)
-    for (_receiver, response) in RENDER_REQUESTED.send(sender=identifier, context=context):
+    for (_receiver, response) in RENDER_REQUESTED.send(
+        sender=identifier,
+        context=context,
+    ):
         content += response
 
     return content

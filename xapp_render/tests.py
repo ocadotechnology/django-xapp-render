@@ -4,6 +4,9 @@ Tests for xapp_render
 
 # pylint: disable=R0904
 # pylint: disable=C0103
+# pylint: disable=C0111
+# pylint: disable=W0232
+# pylint: disable=R0903
 
 import mock
 import os
@@ -13,6 +16,7 @@ import tempfile
 
 from django.core.management import call_command
 from django.dispatch import receiver
+from django import forms
 from django.template import TemplateDoesNotExist
 import django.template.loader
 from django.template.loader import render_to_string
@@ -22,7 +26,7 @@ from django.test.signals import setting_changed
 from django.test.utils import override_settings
 
 from .template_utils import reset_cache
-from .utils import xapp_receiver
+from .utils import xapp_receiver, xapp_form, xapp_form_factory, get_xapp_form
 
 @receiver(setting_changed)
 def cache_reset_handler(*_args, **_kwargs):
@@ -33,6 +37,46 @@ def cache_reset_handler(*_args, **_kwargs):
 def test5_rendered_data(context):
     '''Respond with some data rendered from the context.'''
     return render_to_string('xapp_test_app_1/test5_data.html', context)
+
+@xapp_form('form1')
+@xapp_form('form3')
+class FormA(forms.Form):
+    field_a = forms.CharField()
+
+@xapp_form('form2')
+class FormB(forms.Form):
+    field_b = forms.CharField()
+
+@xapp_form('form2')
+class FormC(forms.Form):
+    field_c = forms.CharField()
+
+@xapp_form('form3')
+class FormD(forms.Form):
+    field_d = forms.CharField()
+
+@xapp_form('form3')
+class FormE(FormD):
+    field_e = forms.CharField()
+
+class FormTestCase(TestCase):
+    '''Test form functionality.'''
+
+    def test_single_form(self):
+        form = xapp_form_factory('form1')()
+        self.assertIn('field_a', form.fields)
+
+    def test_multiple_forms(self):
+        form = get_xapp_form('form2')()
+        self.assertIn('field_b', form.fields)
+        self.assertIn('field_c', form.fields)
+        self.assertNotIn('field_a', form.fields)
+
+    def test_conflicting_mro(self):
+        form = get_xapp_form('form3')()
+        self.assertIn('field_a', form.fields)
+        self.assertIn('field_d', form.fields)
+        self.assertIn('field_e', form.fields)
 
 class AppCreatorTestCase(TestCase):
     '''Test case that creates some extra apps.'''

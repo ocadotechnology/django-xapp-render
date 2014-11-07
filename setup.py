@@ -1,10 +1,10 @@
 '''setup.py for django-xapp-render'''
 from setuptools import setup, find_packages
-from gitversion import get_git_version
+from xapp_render.version import __VERSION__
 
 setup(
     name                 = 'django-xapp-render',
-    version              = get_git_version(__file__),
+    version              = __VERSION__,
     description          = 'Cross app rendering utilities.',
     long_description     = '''Cross app rendering utilities.''',
     author               = 'Netnix',

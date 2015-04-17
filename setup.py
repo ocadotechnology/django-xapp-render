@@ -12,6 +12,6 @@ setup(
     maintainer           = 'Mike Bryant',
     maintainer_email     = 'mike.bryant@ocado.com',
     packages             = find_packages(),
-    install_requires     = ['django >= 1.4', 'coffin', 'jinja2', 'mock'],
+    install_requires     = ['django >= 1.4', 'jinja2'],
     tests_require        = ['coffin', 'jinja2', 'mock'],
 )

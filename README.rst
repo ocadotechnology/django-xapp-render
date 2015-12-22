@@ -9,7 +9,7 @@ Quick Start
 ===========
 
 * Install ``django-xapp-render`` with ``pip install django-xapp-render``.
-* Add ``xapp`` to your ``INSTALLED_APPS``.
+* Add ``xapp_render`` to your ``INSTALLED_APPS``.
 
 ============
 Contributing

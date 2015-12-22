@@ -1,0 +1,12 @@
+*.egg-info
+.GITVERSION
+*.pyc
+docs/_build
+deb_dist
+test_project/test_project/dbfile
+local_settings.py
+*.swp
+.sass-cache
+*.egg
+coverage.xml
+pep8.txt

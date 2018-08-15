@@ -1,0 +1,22 @@
+language: python
+python:
+- 2.7
+install:
+- pip install gitversion
+- pip install "Django${DJANGO}"
+- pip install .
+- pip install coveralls
+script:
+- true
+after_success:
+- coveralls
+deploy:
+  provider: pypi
+  user: ocadotechnology
+  password:
+    secure: "CChW0HgBIyFy8W6EnBJYW0Uy+hSV2v7ji73dhuLEdA/Pteb5YAmD/9ibpsC2TpyjOXfpjBMW+gzsWAUB3rkvU/Z6Rj4w9/VyeFBzz/Djo9Tr3xfVKvuug1C+rv/y2MxrZ4QDnecek4IqWnSVAc0yMFy1w4l3pfqoW7Rg2004/V/xjHCM7DaRG/4U+k2vbPX0VmEGXAVrAcQgJvsupPC4OEoOeMeLTcqVI8XhiOcOz/Av2fhXU+kdNNP04yXmJAmzKZRhtfwcNGmo1HtG9naHiem2JSQlu4na447Uq5uFVytVQbkQLZO9+hjZif79FN4qkHBvLk1bKvsJkBWcK0tGrjwk2yVrGYxq+8jpVqCdXRhD9YQmAmPi9Lbj7l50gq/2sdN6B2hph6bhnglCoNnw6LwgvAdXSSM1BUzTHtcD2TBNruIoyzNrFVTW2f/EtZyYjeewXiZygh2YqIhSxuqxC5znVvb7oPKpeBEa7MwSnUFVhZ9CgbACIhJg/99DyfdfekwcZOgTEHl/+aqZegsjyRgm3JXoqoBwR/Das1r/BNc4vurOCoTLT9qSQG6JQqAO7rFxOEr/LzdylogOo8Xs3SjXuuEjR0Xzdh87LNGSw+f5bSR4xzAW2YPw7xFDpUkfO33nqiL70AHbKvJrgqoSHNUAvM0Oe/A3MbusYbTplkc="
+  distributions: "bdist_wheel sdist"
+  on:
+    all_branches: true
+    repo: ocadotechnology/django-xapp-render
+    tags: true
